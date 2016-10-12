@@ -1,0 +1,6 @@
+post1:
+  title: 'My first Post'
+  content: 'This is the content of my first post.'
+post2:
+  title: 'My last Post'
+  content: 'This is the content of my last post.'
