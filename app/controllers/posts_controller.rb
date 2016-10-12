@@ -1,11 +1,12 @@
 class PostsController < ApplicationController
+  before_action :find_post, only: [:show, :update, :destroy]
 
   def create
-    post = Post.new(post_attrs)
+    post = Post.new(post_params)
     if post.save
       render json: post, status: :created
     else
-      render json: { error: post.errors }, status: :bad_request
+      render json: { errors: post.errors }, status: :bad_request
     end
   end
 
@@ -15,17 +16,32 @@ class PostsController < ApplicationController
   end
 
   def show
-    post = Post.find_by(id: params[:id])
-    if post
-      render json: post
+    render json: @post
+  end
+
+  def update
+    if @post.update(post_params)
+      render json: @post
     else
-      head :not_found
+      render json: { errors: @post.errors }, status: :bad_request
     end
+  end
+
+  def destroy
+    @post.destroy
+    head 200
   end
 
   private
 
-  def post_attrs
+  def post_params
     params.require('post').permit(['title', 'content'])
+  end
+
+  def find_post
+    @post = Post.find_by(id: params[:id])
+    unless @post
+      head :not_found
+    end
   end
 end
