@@ -111,9 +111,9 @@ class PostsTest < ActiveSupport::TestCase
 
     describe "given a valid post id" do
 
-      it "deletes the post and returns 200 OK" do
+      it "deletes the post and returns 204 No Content" do
         delete "posts/#{post.id}"
-        last_response.status.must_equal 200
+        last_response.status.must_equal 204
         last_response.body.must_equal ""
         Post.exists?(post.id).must_equal false
       end

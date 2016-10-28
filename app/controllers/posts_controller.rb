@@ -29,7 +29,7 @@ class PostsController < ApplicationController
 
   def destroy
     @post.destroy
-    head 200
+    head :no_content
   end
 
   private
