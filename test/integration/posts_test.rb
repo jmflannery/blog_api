@@ -18,9 +18,11 @@ class PostsTest < ActiveSupport::TestCase
 
       it "creates a post" do
         post 'posts', attrs
-        post = Post.last
         last_response.status.must_equal 201
-        last_response.body.must_equal %Q({"post":{"id":#{post.id},"title":"My Post","content":"This post rocks!"}})
+        response = JSON.parse(last_response.body)['post']
+        assert_match /\d+/, response['id'].to_s
+        assert_equal 'My Post', response['title']
+        assert_equal 'This post rocks!', response['content']
       end
     end
 
@@ -31,7 +33,8 @@ class PostsTest < ActiveSupport::TestCase
       it "returns 400 Bad Request with a hash of errors" do
         post 'posts', attrs
         last_response.status.must_equal 400
-        last_response.body.must_equal %Q({"errors":{"title":["can't be blank"]}})
+        response = JSON.parse(last_response.body)['errors']
+        assert_equal ["can't be blank"], response['title']
       end
     end
   end
@@ -44,7 +47,11 @@ class PostsTest < ActiveSupport::TestCase
     it "returns all posts" do
       get 'posts'
       last_response.status.must_equal 200
-      last_response.body.must_equal %Q({"posts":[{"id":277846598,"title":"My first Post","content":"This is the content of my first post."},{"id":159828990,"title":"My last Post","content":"This is the content of my last post."}]})
+      response = JSON.parse(last_response.body)['posts']
+      assert_equal 2, response.size
+      assert_equal post1.id, response[0]['id']
+      assert_equal post1.title, response[0]['title']
+      assert_equal post2.content, response[1]['content']
     end
   end
 
@@ -57,7 +64,10 @@ class PostsTest < ActiveSupport::TestCase
       it "returns the post with the given id" do
         get "posts/#{post.id}"
         last_response.status.must_equal 200
-        last_response.body.must_equal %Q({"post":{"id":#{post.id},"title":"My first Post","content":"This is the content of my first post."}})
+        response = JSON.parse(last_response.body)['post']
+        assert_equal post.id, response['id']
+        assert_equal post.title, response['title']
+        assert_equal post.content, response['content']
       end
     end
 
@@ -81,7 +91,9 @@ class PostsTest < ActiveSupport::TestCase
       it "updates the post" do
         put "posts/#{post.id}", post: attrs
         last_response.status.must_equal 200
-        last_response.body.must_equal %Q({"post":{"id":#{post.id},"title":"My first Post","content":"The new content"}})
+        response = JSON.parse(last_response.body)['post']
+        assert_equal post.id, response['id']
+        assert_equal 'The new content', response['content']
       end
     end
 
@@ -100,7 +112,8 @@ class PostsTest < ActiveSupport::TestCase
       it "returns 400 Bad Request with a hash of errors" do
         put "posts/#{post.id}", post: attrs
         last_response.status.must_equal 400
-        last_response.body.must_equal %Q({"errors":{"title":["can't be blank"]}})
+        response = JSON.parse(last_response.body)['errors']
+        assert_equal ["can't be blank"], response['title']
       end
     end
   end
