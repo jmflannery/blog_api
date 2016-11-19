@@ -1,4 +1,4 @@
-class PostsController < ApplicationController
+class Admin::PostsController < ApplicationController
   before_action :find_post, only: [:show, :update, :destroy]
 
   def create
