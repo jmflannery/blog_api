@@ -1,33 +1,26 @@
 require 'test_helper'
 
-OUTER_APP = Rack::Builder.parse_file('config.ru').first
-
 class PostsTest < ActiveSupport::TestCase
 
   include Rack::Test::Methods
 
   def app
-    OUTER_APP
+    Rack::Builder.parse_file('config.ru').first
   end
 
   describe "Create" do
 
     describe "given valid parameters" do
 
-      let(:attrs) {{ post: { title: 'My Post', content: 'This post rocks!' }}}
+      let(:attrs) {{ title: 'My Post', content: 'This post rocks!' }}
 
       it "creates a post" do
-        now = Time.now
-        post 'posts', attrs
+        post 'posts', post: attrs
         last_response.status.must_equal 201
         response = JSON.parse(last_response.body)['post']
         assert_match /\d+/, response['id'].to_s
         assert_equal 'My Post', response['title']
         assert_equal 'This post rocks!', response['content']
-        created_at = Time.parse(response['created_at'])
-        assert_equal now.year, created_at.year
-        assert_equal now.min, created_at.min
-        assert_equal now.sec, created_at.sec
       end
     end
 
@@ -46,11 +39,11 @@ class PostsTest < ActiveSupport::TestCase
 
   describe "Index" do
 
-    let(:post1) { posts(:post1) }
-    let(:post2) { posts(:post2) }
+    let(:post1) { FactoryGirl.create(:post) }
+    let(:post2) { FactoryGirl.create(:post) }
+    setup { [post1, post2] }
 
     it "returns all posts" do
-      now = Time.now
       get 'posts'
       last_response.status.must_equal 200
       response = JSON.parse(last_response.body)['posts']
@@ -58,29 +51,22 @@ class PostsTest < ActiveSupport::TestCase
       assert_equal post1.id, response[0]['id']
       assert_equal post1.title, response[0]['title']
       assert_equal post2.content, response[1]['content']
-      created_at = Time.parse(response[1]['created_at'])
-      assert_equal now.min, created_at.min
-      assert_equal now.sec, created_at.sec
     end
   end
 
   describe "Show" do
 
-    let(:post) { posts(:post1) }
+    let(:post) { FactoryGirl.create(:post) }
 
     describe "given a valid post id" do
 
       it "returns the post with the given id" do
-        now = Time.now
         get "posts/#{post.id}"
         last_response.status.must_equal 200
         response = JSON.parse(last_response.body)['post']
         assert_equal post.id, response['id']
         assert_equal post.title, response['title']
         assert_equal post.content, response['content']
-        created_at = Time.parse(response['created_at'])
-        assert_equal now.min, created_at.min
-        assert_equal now.sec, created_at.sec
       end
     end
 
@@ -96,21 +82,17 @@ class PostsTest < ActiveSupport::TestCase
 
   describe "Update" do
 
-    let(:post) { posts(:post1) }
+    let(:post) { FactoryGirl.create(:post) }
     let(:attrs) {{ content: 'The new content' }}
 
     describe "given a valid post id and valid attributes" do
 
       it "updates the post" do
-        now = Time.now
         put "posts/#{post.id}", post: attrs
         last_response.status.must_equal 200
         response = JSON.parse(last_response.body)['post']
         assert_equal post.id, response['id']
         assert_equal 'The new content', response['content']
-        updated_at = Time.parse(response['updated_at'])
-        assert_equal now.min, updated_at.min
-        assert_equal now.sec, updated_at.sec
       end
     end
 
@@ -137,7 +119,7 @@ class PostsTest < ActiveSupport::TestCase
 
   describe "Delete" do
 
-    let(:post) { posts(:post1) }
+    let(:post) { FactoryGirl.create(:post) }
 
     describe "given a valid post id" do
 
