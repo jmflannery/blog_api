@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  resources :posts, only: [:index, :show]
+  mount Toke::Engine => "/"
+
+  # resources :posts, only: [:index, :show]
 
   namespace :admin do
     resources :posts
