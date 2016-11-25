@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/jmflannery/toke.git
-  revision: 7b3bced79ef405cbcd1c98428b014fe3600dc13a
+  revision: 4db2af0806e9c66d0d70287308f81782c5682c07
   specs:
     toke (0.0.1)
       active_model_serializers

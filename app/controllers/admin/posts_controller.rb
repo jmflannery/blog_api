@@ -1,5 +1,6 @@
 class Admin::PostsController < ApplicationController
   before_action :find_post, only: [:show, :update, :destroy]
+  before_action :toke!
 
   def create
     post = Post.new(post_params)
