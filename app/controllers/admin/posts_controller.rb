@@ -1,6 +1,13 @@
 class Admin::PostsController < ApplicationController
   before_action :find_post, only: [:show, :update, :destroy]
-  before_action :toke!
+
+  before_action :toke!, only: [:create, :show, :update, :destroy]
+
+  before_action only: :index do
+    toke! do |errors|
+      render json: Post.published
+    end
+  end
 
   def create
     post = Post.new(post_params)
@@ -12,8 +19,7 @@ class Admin::PostsController < ApplicationController
   end
 
   def index
-    posts = Post.all
-    render json: posts
+    render json: Post.all
   end
 
   def show

@@ -62,9 +62,10 @@ class Admin::PostsTest < ActiveSupport::TestCase
 
   describe "Index" do
 
-    let(:post1) { FactoryGirl.create(:post) }
-    let(:post2) { FactoryGirl.create(:post) }
-    setup { [post1, post2] }
+    let(:unpublished1) { FactoryGirl.create(:post) }
+    let(:unpublished2) { FactoryGirl.create(:post) }
+    let(:published) { FactoryGirl.create(:published_post) }
+    setup { @post_ids = [unpublished1.id, unpublished2.id, published.id] }
 
     describe 'given a valid Token' do
 
@@ -77,11 +78,12 @@ class Admin::PostsTest < ActiveSupport::TestCase
       it "returns all posts" do
         get 'admin/posts'
         last_response.status.must_equal 200
-        response = JSON.parse(last_response.body)['posts']
-        assert_equal 2, response.size
-        assert_equal post1.id, response[0]['id']
-        assert_equal post1.title, response[0]['title']
-        assert_equal post2.content, response[1]['content']
+        posts = JSON.parse(last_response.body)['posts']
+        assert_equal 3, posts.size
+        ids = posts.map { |p| p['id'] }
+        ids.must_include unpublished1.id
+        ids.must_include unpublished2.id
+        ids.must_include published.id
       end
     end
 
@@ -90,9 +92,13 @@ class Admin::PostsTest < ActiveSupport::TestCase
         header 'Authorization', "Bearer wrong"
       end
 
-      it 'returns 401 Unauthorized' do
+      it 'returns only published posts' do
         get 'admin/posts'
-        last_response.status.must_equal 401
+        last_response.status.must_equal 200
+        posts = JSON.parse(last_response.body)['posts']
+        assert_equal 1, posts.size
+        ids = posts.map { |p| p['id'] }
+        ids.must_include published.id
       end
     end
   end
