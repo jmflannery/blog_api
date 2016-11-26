@@ -115,7 +115,21 @@ class Admin::PostsTest < ActiveSupport::TestCase
         header 'Authorization', "Bearer #{token.key}"
       end
 
-      describe "given a valid post id" do
+      describe "given a valid published post id" do
+        let(:post) { FactoryGirl.create(:published_post) }
+
+        it "returns the post with the given id" do
+          get "admin/posts/#{post.id}"
+          last_response.status.must_equal 200
+          response = JSON.parse(last_response.body)['post']
+          assert_equal post.id, response['id']
+          assert_equal post.title, response['title']
+          assert_equal post.content, response['content']
+        end
+      end
+
+      describe "given an unpublished post id" do
+        let(:post) { FactoryGirl.create(:post) }
 
         it "returns the post with the given id" do
           get "admin/posts/#{post.id}"
@@ -137,14 +151,29 @@ class Admin::PostsTest < ActiveSupport::TestCase
       end
     end
 
-    describe 'given an invalid Token' do
-      before do
-        header 'Authorization', "Bearer wrong"
+    describe 'given no Token' do
+
+      describe "given a valid published post id" do
+        let(:post) { FactoryGirl.create(:published_post) }
+
+        it "returns the post with the given id" do
+          get "admin/posts/#{post.id}"
+          last_response.status.must_equal 200
+          response = JSON.parse(last_response.body)['post']
+          assert_equal post.id, response['id']
+          assert_equal post.title, response['title']
+          assert_equal post.content, response['content']
+        end
       end
 
-      it 'returns 401 Unauthorized' do
-        get "admin/posts/#{post.id}"
-        last_response.status.must_equal 401
+      describe "given an unpublished post id" do
+        let(:post) { FactoryGirl.create(:post) }
+
+        it "returns 404 Not Found" do
+          get "admin/posts/#{post.id}"
+          last_response.status.must_equal 404
+          last_response.body.must_equal ""
+        end
       end
     end
   end
