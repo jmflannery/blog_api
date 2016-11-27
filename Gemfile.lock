@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/jmflannery/toke.git
-  revision: 7471201313d2bded3d369fc38ec95da99ab1f975
+  revision: 3c6994d6b01c273557440dbbc7142361898015ff
   specs:
-    toke (0.0.1)
+    toke (0.1.0)
       active_model_serializers
       bcrypt-ruby
       jwt
@@ -114,7 +114,7 @@ GEM
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
     pg (0.19.0)
-    puma (3.6.0)
+    puma (3.6.2)
     rack (2.0.1)
     rack-cors (0.4.0)
     rack-test (0.6.3)
@@ -158,10 +158,10 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sshkit (1.11.3)
+    sshkit (1.11.4)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    thor (0.19.1)
+    thor (0.19.3)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
