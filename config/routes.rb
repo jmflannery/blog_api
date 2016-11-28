@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  mount Toke::Engine => "/"
+  mount Toker::Engine => "/"
 
   resources :posts
 end
