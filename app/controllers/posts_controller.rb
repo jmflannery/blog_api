@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
-  before_action :toke!, only: [:create, :update, :destroy]
-  before_action :find_post, only: [:update, :destroy]
+  before_action :toke!, only: [:create, :update, :destroy, :publish]
+  before_action :find_post, only: [:update, :destroy, :publish]
 
   before_action only: :index do
     toke! do |errors|
@@ -45,6 +45,11 @@ class PostsController < ApplicationController
   def destroy
     @post.destroy
     head :no_content
+  end
+
+  def publish
+    @post.publish
+    render json: @post
   end
 
   private

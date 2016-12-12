@@ -32,6 +32,7 @@ class PostsTest < ActiveSupport::TestCase
           response['id'].to_s.must_match /\d+/
           response['title'].must_equal 'My Post'
           response['content'].must_equal 'This post rocks!'
+          response['published_at'].must_be_nil
         end
       end
 
@@ -274,6 +275,52 @@ class PostsTest < ActiveSupport::TestCase
 
       it 'returns 401 Unauthorized' do
         delete "posts/#{post.id}"
+        last_response.status.must_equal 401
+      end
+    end
+  end
+
+  describe 'Publish' do
+
+    let(:post) { FactoryGirl.create(:post) }
+    let(:attrs) {{ content: 'The new content' }}
+
+    describe 'given a valid Token' do
+
+      before do
+        token.generate_key!
+        token.save
+        header 'Authorization', "Bearer #{token.key}"
+      end
+
+      describe "given a valid post id" do
+
+        it "updates the post" do
+          time = Time.zone.now
+          put "posts/#{post.id}/publish", post: attrs
+          last_response.status.must_equal 200
+          response = JSON.parse(last_response.body)['post']
+          response['published_at'].must_equal time.iso8601
+        end
+      end
+
+      describe "given an invalid post id" do
+
+        it "returns 404 Not Found" do
+          put "posts/invalid/publish", post: attrs
+          last_response.status.must_equal 404
+          last_response.body.must_equal ""
+        end
+      end
+    end
+
+    describe 'given an invalid Token' do
+      before do
+        header 'Authorization', "Bearer wrong"
+      end
+
+      it 'returns 401 Unauthorized' do
+        put "posts/invalid/publish", post: attrs
         last_response.status.must_equal 401
       end
     end
