@@ -1,6 +1,5 @@
 class PostsController < ApplicationController
   before_action :toke!, only: [:create, :update, :destroy, :publish]
-  before_action :find_post, only: [:update, :destroy, :publish]
 
   before_action only: :index do
     toke! do |errors|
@@ -10,11 +9,12 @@ class PostsController < ApplicationController
 
   before_action only: :show do
     toke! do |errors|
-      @posts = Post.published
+      @post = Post.published.find_by id: params[:id]
+      render json: { errors: { post_id: 'Post not found' }}, status: :not_found unless @post
     end
   end
 
-  before_action :get_post, only: :show
+  before_action :find_post, only: [:show, :update, :destroy, :publish]
 
   def create
     post = Post.new(post_params)
@@ -30,7 +30,6 @@ class PostsController < ApplicationController
   end
 
   def show
-    post = @posts.where
     render json: @post
   end
 
@@ -58,14 +57,8 @@ class PostsController < ApplicationController
     params.require('post').permit(['title', 'content'])
   end
 
-  def get_post
-    @posts ||= Post.all
-    @post = @posts.find_by(id: params[:id])
-    head :not_found unless @post
-  end
-
   def find_post
     @post = Post.find_by(id: params[:id])
-    head :not_found unless @post
+    render json: { errors: { post_id: 'Post not found' }}, status: :not_found unless @post
   end
 end

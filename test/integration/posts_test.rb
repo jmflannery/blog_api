@@ -117,28 +117,28 @@ class PostsTest < ActiveSupport::TestCase
       end
 
       describe "given a valid published post id" do
-        let(:post) { FactoryGirl.create(:published_post) }
+        let(:published_post) { FactoryGirl.create(:published_post) }
 
         it "returns the post with the given id" do
-          get "posts/#{post.id}"
+          get "posts/#{published_post.id}"
           last_response.status.must_equal 200
           response = JSON.parse(last_response.body)['post']
-          assert_equal post.id, response['id']
-          assert_equal post.title, response['title']
-          assert_equal post.content, response['content']
+          assert_equal published_post.id, response['id']
+          assert_equal published_post.title, response['title']
+          assert_equal published_post.content, response['content']
         end
       end
 
       describe "given an unpublished post id" do
-        let(:post) { FactoryGirl.create(:post) }
+        let(:unpublished_post) { FactoryGirl.create(:post) }
 
         it "returns the post with the given id" do
-          get "posts/#{post.id}"
+          get "posts/#{unpublished_post.id}"
           last_response.status.must_equal 200
           response = JSON.parse(last_response.body)['post']
-          assert_equal post.id, response['id']
-          assert_equal post.title, response['title']
-          assert_equal post.content, response['content']
+          assert_equal unpublished_post.id, response['id']
+          assert_equal unpublished_post.title, response['title']
+          assert_equal unpublished_post.content, response['content']
         end
       end
 
@@ -147,7 +147,8 @@ class PostsTest < ActiveSupport::TestCase
         it "returns 404 Not Found" do
           get "posts/12345"
           last_response.status.must_equal 404
-          last_response.body.must_equal ""
+          error = JSON.parse(last_response.body)['errors'].symbolize_keys
+          error[:post_id].must_equal 'Post not found'
         end
       end
     end
@@ -155,25 +156,26 @@ class PostsTest < ActiveSupport::TestCase
     describe 'given no Token' do
 
       describe "given a valid published post id" do
-        let(:post) { FactoryGirl.create(:published_post) }
+        let(:published_post) { FactoryGirl.create(:published_post) }
 
         it "returns the post with the given id" do
-          get "posts/#{post.id}"
+          get "posts/#{published_post.id}"
           last_response.status.must_equal 200
           response = JSON.parse(last_response.body)['post']
-          assert_equal post.id, response['id']
-          assert_equal post.title, response['title']
-          assert_equal post.content, response['content']
+          assert_equal published_post.id, response['id']
+          assert_equal published_post.title, response['title']
+          assert_equal published_post.content, response['content']
         end
       end
 
       describe "given an unpublished post id" do
-        let(:post) { FactoryGirl.create(:post) }
+        let(:unpublished_post) { FactoryGirl.create(:post) }
 
         it "returns 404 Not Found" do
-          get "posts/#{post.id}"
+          get "posts/#{unpublished_post.id}"
           last_response.status.must_equal 404
-          last_response.body.must_equal ""
+          error = JSON.parse(last_response.body)['errors'].symbolize_keys
+          error[:post_id].must_equal 'Post not found'
         end
       end
     end
@@ -208,7 +210,8 @@ class PostsTest < ActiveSupport::TestCase
         it "returns 404 Not Found" do
           put "posts/12345", post: attrs
           last_response.status.must_equal 404
-          last_response.body.must_equal ""
+          error = JSON.parse(last_response.body)['errors'].symbolize_keys
+          error[:post_id].must_equal 'Post not found'
         end
       end
 
@@ -263,7 +266,8 @@ class PostsTest < ActiveSupport::TestCase
         it "returns 404 Not Found" do
           delete "posts/12345"
           last_response.status.must_equal 404
-          last_response.body.must_equal ""
+          error = JSON.parse(last_response.body)['errors'].symbolize_keys
+          error[:post_id].must_equal 'Post not found'
         end
       end
     end
@@ -309,7 +313,8 @@ class PostsTest < ActiveSupport::TestCase
         it "returns 404 Not Found" do
           put "posts/invalid/publish", post: attrs
           last_response.status.must_equal 404
-          last_response.body.must_equal ""
+          errors = JSON.parse(last_response.body)['errors'].symbolize_keys
+          errors[:post_id].must_equal 'Post not found'
         end
       end
     end
