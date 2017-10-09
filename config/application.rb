@@ -29,7 +29,7 @@ module BlogApi
 
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins ['localhost:4200', 'jackflannery.blog']
+        origins 'jackflannery.blog',
         resource '*',
           :methods => [:get, :post, :delete, :put, :patch, :options, :head],
           :headers => :any,
