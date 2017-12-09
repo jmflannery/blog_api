@@ -13,7 +13,7 @@ class PostsTest < ActiveSupport::TestCase
 
   describe "Create" do
 
-    let(:attrs) {{ title: 'My Post', content: 'This post rocks!' }}
+    let(:attrs) {{ title: 'My Post', content: 'This post rocks!', slug: 'this-post-rocks' }}
 
     describe 'given a valid Token' do
 
@@ -32,19 +32,21 @@ class PostsTest < ActiveSupport::TestCase
           response['id'].to_s.must_match /\d+/
           response['title'].must_equal 'My Post'
           response['content'].must_equal 'This post rocks!'
+          response['slug'].must_equal 'this-post-rocks'
           response['published_at'].must_be_nil
         end
       end
 
       describe "given invalid attributes" do
 
-        let(:invalid_attrs) {{ post: { title: '', content: 'This post rocks!' }}}
+        let(:invalid_attrs) {{ post: { title: '', content: 'This post rocks!', slug: '' }}}
 
         it "returns 400 Bad Request with a hash of errors" do
           post 'posts', invalid_attrs
           last_response.status.must_equal 400
           response = JSON.parse(last_response.body)['errors']
           response['title'].must_equal ["can't be blank"]
+          response['slug'].must_equal ["can't be blank"]
         end
       end
     end
@@ -125,6 +127,7 @@ class PostsTest < ActiveSupport::TestCase
           response = JSON.parse(last_response.body)['post']
           assert_equal published_post.id, response['id']
           assert_equal published_post.title, response['title']
+          assert_equal published_post.slug, response['slug']
           assert_equal published_post.content, response['content']
         end
       end
@@ -138,6 +141,7 @@ class PostsTest < ActiveSupport::TestCase
           response = JSON.parse(last_response.body)['post']
           assert_equal unpublished_post.id, response['id']
           assert_equal unpublished_post.title, response['title']
+          assert_equal unpublished_post.slug, response['slug']
           assert_equal unpublished_post.content, response['content']
         end
       end
@@ -164,6 +168,7 @@ class PostsTest < ActiveSupport::TestCase
           response = JSON.parse(last_response.body)['post']
           assert_equal published_post.id, response['id']
           assert_equal published_post.title, response['title']
+          assert_equal published_post.slug, response['slug']
           assert_equal published_post.content, response['content']
         end
       end
