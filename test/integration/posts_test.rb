@@ -39,14 +39,34 @@ class PostsTest < ActiveSupport::TestCase
 
       describe "given invalid attributes" do
 
-        let(:invalid_attrs) {{ post: { title: '', content: 'This post rocks!', slug: '' }}}
+        describe "invalid blank post title and slug" do
+          let(:invalid_attrs) {{ post: { title: '', content: 'This post rocks!', slug: '' }}}
 
-        it "returns 400 Bad Request with a hash of errors" do
-          post 'posts', invalid_attrs
-          last_response.status.must_equal 400
-          response = JSON.parse(last_response.body)['errors']
-          response['title'].must_equal ["can't be blank"]
-          response['slug'].must_equal ["can't be blank"]
+          it "returns 400 Bad Request with a hash of errors" do
+            post 'posts', invalid_attrs
+            last_response.status.must_equal 400
+            response = JSON.parse(last_response.body)['errors']
+            response['title'].must_equal ["can't be blank"]
+            response['slug'].must_equal ["can't be blank"]
+          end
+        end
+
+        describe "invalid duplicate slug" do
+          let(:post1) { Post.create({
+            title: 'How to Skin a Cat',
+            slug: 'how-to-skin-a-cat',
+            content: 'Step one: get the sheers'
+          })}
+
+          let(:invalid_attrs) {{ post: { title: 'How to - skin a cat!!', slug: 'how-to-skin-a-cat', content: '' }}}
+
+          it "returns 400 Bad Request with a hash of errors" do
+            post1
+            post 'posts', invalid_attrs
+            last_response.status.must_equal 400
+            response = JSON.parse(last_response.body)['errors']
+            response['slug'].must_equal ["has already been taken"]
+          end
         end
       end
     end
