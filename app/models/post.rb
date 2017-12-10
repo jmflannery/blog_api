@@ -1,7 +1,6 @@
 class Post < ApplicationRecord
   validates :title, presence: true
-  validates :slug, presence: true
-  validates :slug, uniqueness: true
+  validates :slug, presence: true, uniqueness: true
 
   scope :published, -> { where.not(published_at: nil) }
 

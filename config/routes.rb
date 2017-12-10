@@ -6,4 +6,6 @@ Rails.application.routes.draw do
       put :publish
     end
   end
+
+  resources :tags, only: [:create, :destroy]
 end
