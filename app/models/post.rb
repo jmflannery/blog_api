@@ -1,4 +1,7 @@
 class Post < ApplicationRecord
+  has_many :tagged_posts
+  has_many :tags, through: :tagged_posts
+
   validates :title, presence: true
   validates :slug, presence: true, uniqueness: true
 

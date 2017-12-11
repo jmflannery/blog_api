@@ -15,10 +15,14 @@ class PostsController < ApplicationController
   end
 
   before_action :find_post, only: [:show, :update, :destroy, :publish]
+  before_action :find_tags, only: [:create]
 
   def create
     post = Post.new(post_params)
     if post.save
+      if @tags
+        @tags.each { |tag| post.tags << tag }
+      end
       render json: post, status: :created
     else
       render json: { errors: post.errors }, status: :bad_request
@@ -60,5 +64,10 @@ class PostsController < ApplicationController
   def find_post
     @post = Post.find_by(id: params[:id])
     render json: { errors: { post_id: 'Post not found' }}, status: :not_found unless @post
+  end
+
+  def find_tags
+    return unless params[:tags]
+    @tags = Tag.find(params[:tags])
   end
 end

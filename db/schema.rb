@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171209234410) do
+ActiveRecord::Schema.define(version: 20171211034412) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,15 @@ ActiveRecord::Schema.define(version: 20171209234410) do
     t.datetime "updated_at",   null: false
     t.datetime "published_at"
     t.text     "slug"
+  end
+
+  create_table "tagged_posts", force: :cascade do |t|
+    t.integer  "post_id"
+    t.integer  "tag_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_tagged_posts_on_post_id", using: :btree
+    t.index ["tag_id"], name: "index_tagged_posts_on_tag_id", using: :btree
   end
 
   create_table "tags", force: :cascade do |t|
@@ -47,4 +56,6 @@ ActiveRecord::Schema.define(version: 20171209234410) do
     t.index ["email"], name: "index_toker_users_on_email", using: :btree
   end
 
+  add_foreign_key "tagged_posts", "posts"
+  add_foreign_key "tagged_posts", "tags"
 end
