@@ -73,4 +73,50 @@ class TagsTest < ActiveSupport::TestCase
       end
     end
   end
+
+  describe "Destroy" do
+
+    let(:tag) { Tag.create(name: 'ruby') }
+
+    describe 'given a valid Token' do
+
+      before do
+        token.generate_key!
+        token.save
+        header 'Authorization', "Bearer #{token.key}"
+        tag
+      end
+
+      describe "given a valid tag id" do
+
+        it "deletes the tag and returns 204 No Content" do
+          delete "tags/#{tag.id}"
+          last_response.status.must_equal 204
+          last_response.body.must_equal ""
+          Tag.exists?(tag.id).must_equal false
+        end
+      end
+
+      describe "given an invalid tag id" do
+
+        it "returns 404 Not Found" do
+          delete "tags/12345"
+          last_response.status.must_equal 404
+          error = JSON.parse(last_response.body)['errors'].symbolize_keys
+          error[:id].must_equal 'Tag not found'
+        end
+      end
+    end
+
+    describe 'given an invalid Token' do
+      before do
+        header 'Authorization', "Bearer wrong"
+      end
+
+      it 'returns 401 Unauthorized' do
+        delete "tags/#{tag.id}"
+        last_response.status.must_equal 401
+      end
+    end
+  end
 end
