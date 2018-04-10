@@ -9,7 +9,8 @@ gem 'pg', '~> 0.18'
 gem 'puma', '~> 3.0'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
-gem 'active_model_serializers', '~> 0.10.0'
+gem 'active_model_serializers', '~> 0.10'
+gem 'json', '~> 2.1'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
@@ -34,9 +35,9 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 
   # Deploy with Capistrano
-  gem 'capistrano',         '~> 3.6', require: false
-  gem 'capistrano-bundler', '~> 1.2', require: false
-  gem 'capistrano-rails',   '~> 1.1', require: false
+  gem 'capistrano', require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-rails', require: false
   gem 'capistrano-chruby',  require: false
   gem 'capistrano3-puma',   require: false
 end
