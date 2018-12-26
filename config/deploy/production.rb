@@ -12,7 +12,7 @@ set :domain_name, 'jackflannery.me'
 
 set :deploy_user, 'deployer'
 
-set :chruby_ruby, 'ruby 2.3.1p112'
+set :chruby_ruby, 'ruby 2.5.1p57'
 
 set :rails_env, 'production'
 
@@ -20,7 +20,7 @@ set :secret_key_base, ask('Secret key base:', 'secret', echo: false)
 
 set :db_passwd, ask('Database password:', 'secret', echo: false)
 
-set :db_server, 'db.jackflannery.me'
+set :db_server, '45.55.184.236'
 
 set :nginx_server_name, 'jackflannery.me'
 
