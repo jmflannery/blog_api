@@ -3,7 +3,7 @@ class PostsController < ApplicationController
 
   before_action only: :index do
     toke! do |errors|
-      render json: Post.published
+      render json: Post.published, each_serializer: serializer
     end
   end
 
@@ -30,7 +30,7 @@ class PostsController < ApplicationController
   end
 
   def index
-    render json: Post.all
+    render json: Post.all, each_serializer: serializer
   end
 
   def show
@@ -69,5 +69,13 @@ class PostsController < ApplicationController
   def find_tags
     return unless params[:tags]
     @tags = Tag.find(params[:tags])
+  end
+
+  def serializer
+    if params[:type] == 'list'
+      Posts::ListItemSerializer
+    else
+      PostSerializer
+    end
   end
 end
