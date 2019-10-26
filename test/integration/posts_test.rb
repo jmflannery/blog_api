@@ -138,38 +138,48 @@ class PostsTest < ActiveSupport::TestCase
         header 'Authorization', "Bearer #{token.key}"
       end
 
-      describe "given a valid published post id" do
+      describe "when requesting a published Post" do
         let(:published_post) { FactoryGirl.create(:published_post) }
 
-        it "returns the post with the given id" do
-          get "posts/#{published_post.id}"
-          last_response.status.must_equal 200
-          response = JSON.parse(last_response.body)['post']
-          assert_equal published_post.id, response['id']
-          assert_equal published_post.title, response['title']
-          assert_equal published_post.slug, response['slug']
-          assert_equal published_post.content, response['content']
+        describe "given a valid Post id" do
+          it "returns the Post with the given id" do
+            get "posts/#{published_post.id}"
+            last_response.status.must_equal 200
+            response = JSON.parse(last_response.body)['post']
+            assert_equal published_post.id, response['id']
+            assert_equal published_post.title, response['title']
+            assert_equal published_post.slug, response['slug']
+            assert_equal published_post.content, response['content']
+          end
+        end
+
+        describe "given a valid Post slug" do
+          it "returns the Post with the given slug" do
+            get "posts/#{published_post.id}"
+            last_response.status.must_equal 200
+            response = JSON.parse(last_response.body)['post']
+            assert_equal published_post.id, response['id']
+          end
         end
       end
 
-      describe "given an unpublished post id" do
+      describe "when requesting an unpublished Post" do
         let(:unpublished_post) { FactoryGirl.create(:post) }
 
-        it "returns the post with the given id" do
-          get "posts/#{unpublished_post.id}"
-          last_response.status.must_equal 200
-          response = JSON.parse(last_response.body)['post']
-          assert_equal unpublished_post.id, response['id']
-          assert_equal unpublished_post.title, response['title']
-          assert_equal unpublished_post.slug, response['slug']
-          assert_equal unpublished_post.content, response['content']
+        describe "given a Post slug" do
+          it "returns the Post with the given slug" do
+            get "posts/#{unpublished_post.id}"
+            last_response.status.must_equal 200
+            response = JSON.parse(last_response.body)['post']
+            assert_equal unpublished_post.slug, response['slug']
+          end
         end
       end
 
-      describe "given an invalid post id" do
+      describe "given an invalid Post id" do
 
         it "returns 404 Not Found" do
-          get "posts/12345"
+          get "posts/invalid"
           last_response.status.must_equal 404
           error = JSON.parse(last_response.body)['errors'].symbolize_keys
           error[:post_id].must_equal 'Post not found'
@@ -179,21 +189,23 @@ class PostsTest < ActiveSupport::TestCase
 
     describe 'given no Token' do
 
-      describe "given a valid published post id" do
+      describe "when requesting a published Post" do
         let(:published_post) { FactoryGirl.create(:published_post) }
 
-        it "returns the post with the given id" do
-          get "posts/#{published_post.id}"
-          last_response.status.must_equal 200
-          response = JSON.parse(last_response.body)['post']
-          assert_equal published_post.id, response['id']
-          assert_equal published_post.title, response['title']
-          assert_equal published_post.slug, response['slug']
-          assert_equal published_post.content, response['content']
+        describe 'given a valid Post slug' do
+          it "returns the Post with the given slug" do
+            get "posts/#{published_post.slug}"
+            last_response.status.must_equal 200
+            response = JSON.parse(last_response.body)['post']
+            assert_equal published_post.slug, response['slug']
+            assert_equal published_post.id, response['id']
+            assert_equal published_post.title, response['title']
+            assert_equal published_post.content, response['content']
+          end
         end
       end
 
-      describe "given an unpublished post id" do
+      describe "when requesting an unpublished Post" do
         let(:unpublished_post) { FactoryGirl.create(:post) }
 
         it "returns 404 Not Found" do

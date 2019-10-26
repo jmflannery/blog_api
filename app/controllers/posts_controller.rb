@@ -9,7 +9,8 @@ class PostsController < ApplicationController
 
   before_action only: :show do
     toke! do |errors|
-      @post = Post.published.find_by id: params[:id]
+      @post = Post.published.find_by(id:   params[:id])
+      @post = Post.published.find_by(slug: params[:id]) unless @post
       render json: { errors: { post_id: 'Post not found' }}, status: :not_found unless @post
     end
   end
@@ -62,7 +63,8 @@ class PostsController < ApplicationController
   end
 
   def find_post
-    @post = Post.find_by(id: params[:id])
+    @post = Post.find_by(id:   params[:id])
+    @post = Post.find_by(slug: params[:id]) unless @post
     render json: { errors: { post_id: 'Post not found' }}, status: :not_found unless @post
   end
 
